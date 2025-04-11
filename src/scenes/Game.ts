@@ -59,7 +59,9 @@ export class Game extends Scene
     create ()
     {
         // Add background
-        this.add.image(400, 300, 'background');
+        const background = this.add.image(0, 0, 'background');
+        background.setOrigin(0, 0);
+        background.setDisplaySize(this.game.config.width as number, this.game.config.height as number);
 
         // Create tilemap
         this.tilemap = this.make.tilemap({
