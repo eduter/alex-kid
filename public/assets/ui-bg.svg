@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="600" version="1.1" viewBox="0 0 200 600" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="200" height="600" fill="#2c2c2c" opacity="0.9"/>
+    <rect width="200" height="600" stroke="#4a4a4a" stroke-width="2" fill="none"/>
+    
+    <!-- Title -->
+    <rect width="200" height="40" fill="#4a4a4a"/>
+    <text x="100" y="28" font-family="Arial" font-size="16" fill="white" text-anchor="middle">Tile Palette</text>
+    
+    <!-- Dividers -->
+    <line x1="0" y1="340" x2="200" y2="340" stroke="#4a4a4a" stroke-width="2"/>
+    <text x="100" y="370" font-family="Arial" font-size="16" fill="white" text-anchor="middle">Tools</text>
+</svg> 

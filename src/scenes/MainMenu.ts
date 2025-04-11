@@ -1,11 +1,7 @@
-import { Scene, GameObjects } from 'phaser';
+import { Scene } from 'phaser';
 
 export class MainMenu extends Scene
 {
-    background: GameObjects.Image;
-    logo: GameObjects.Image;
-    title: GameObjects.Text;
-
     constructor ()
     {
         super('MainMenu');
@@ -13,20 +9,46 @@ export class MainMenu extends Scene
 
     create ()
     {
-        this.background = this.add.image(512, 384, 'background');
-
-        this.logo = this.add.image(512, 300, 'logo');
-
-        this.title = this.add.text(512, 460, 'Main Menu', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
-            align: 'center'
+        // Add title
+        this.add.text(400, 200, 'Ninja Game', {
+            fontSize: '64px',
+            color: '#fff'
         }).setOrigin(0.5);
 
-        this.input.once('pointerdown', () => {
-
+        // Add play button
+        const playButton = this.add.text(400, 300, 'Play', {
+            fontSize: '32px',
+            color: '#fff',
+            backgroundColor: '#4a4a4a',
+            padding: { x: 20, y: 10 }
+        })
+        .setOrigin(0.5)
+        .setInteractive()
+        .on('pointerdown', () => {
             this.scene.start('Game');
+        });
 
+        // Add level editor button
+        const editorButton = this.add.text(400, 380, 'Level Editor', {
+            fontSize: '32px',
+            color: '#fff',
+            backgroundColor: '#4a4a4a',
+            padding: { x: 20, y: 10 }
+        })
+        .setOrigin(0.5)
+        .setInteractive()
+        .on('pointerdown', () => {
+            this.scene.start('LevelEditor');
+        });
+
+        // Add hover effects
+        [playButton, editorButton].forEach(button => {
+            button.on('pointerover', () => {
+                button.setStyle({ backgroundColor: '#666666' });
+            });
+            button.on('pointerout', () => {
+                button.setStyle({ backgroundColor: '#4a4a4a' });
+            });
         });
     }
 }

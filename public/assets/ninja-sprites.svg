@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="256" version="1.1" viewBox="0 0 1024 256" xmlns="http://www.w3.org/2000/svg">
+    <!-- Idle Animation (2 frames) -->
+    <g transform="translate(0,0)">
+        <!-- Frame 1: Idle -->
+        <g transform="translate(32,32)">
+            <!-- Head -->
+            <circle cx="0" cy="-24" r="16" fill="#2c2c2c"/>
+            <!-- Hood -->
+            <path d="M-16,-8 C-16,-24 -8,-32 0,-32 C8,-32 16,-24 16,-8" fill="#2c2c2c"/>
+            <!-- Face -->
+            <circle cx="-6" cy="-26" r="2" fill="#fff"/>
+            <circle cx="6" cy="-26" r="2" fill="#fff"/>
+            <!-- Body -->
+            <path d="M-8,8 L8,8 L12,64 L-12,64 Z" fill="#2c2c2c"/>
+            <!-- Arms -->
+            <path d="M-8,8 C-16,8 -24,16 -24,24" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <path d="M8,8 C16,8 24,16 24,24" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+        </g>
+    </g>
+    <g transform="translate(64,0)">
+        <!-- Frame 2: Idle (slight movement) -->
+        <g transform="translate(32,32)">
+            <!-- Head -->
+            <circle cx="0" cy="-24" r="16" fill="#2c2c2c"/>
+            <!-- Hood -->
+            <path d="M-16,-8 C-16,-24 -8,-32 0,-32 C8,-32 16,-24 16,-8" fill="#2c2c2c"/>
+            <!-- Face -->
+            <circle cx="-6" cy="-26" r="2" fill="#fff"/>
+            <circle cx="6" cy="-26" r="2" fill="#fff"/>
+            <!-- Body -->
+            <path d="M-8,8 L8,8 L12,64 L-12,64 Z" fill="#2c2c2c"/>
+            <!-- Arms (slightly different position) -->
+            <path d="M-8,8 C-16,8 -24,20 -24,28" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <path d="M8,8 C16,8 24,20 24,28" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+        </g>
+    </g>
+
+    <!-- Run Animation (6 frames) -->
+    <g transform="translate(128,0)">
+        <!-- Frame 1: Run -->
+        <g transform="translate(32,32)">
+            <!-- Head -->
+            <circle cx="0" cy="-24" r="16" fill="#2c2c2c"/>
+            <!-- Hood -->
+            <path d="M-16,-8 C-16,-24 -8,-32 0,-32 C8,-32 16,-24 16,-8" fill="#2c2c2c"/>
+            <!-- Face -->
+            <circle cx="-6" cy="-26" r="2" fill="#fff"/>
+            <circle cx="6" cy="-26" r="2" fill="#fff"/>
+            <!-- Body -->
+            <path d="M-8,8 L8,8 L12,64 L-12,64 Z" fill="#2c2c2c"/>
+            <!-- Arms -->
+            <path d="M-8,8 C-16,8 -24,16 -24,24" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <path d="M8,8 C16,8 24,16 24,24" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <!-- Legs -->
+            <path d="M-8,64 L-16,80" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <path d="M8,64 L16,80" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+        </g>
+    </g>
+    <g transform="translate(192,0)">
+        <!-- Frame 2: Run -->
+        <g transform="translate(32,32)">
+            <!-- Head -->
+            <circle cx="0" cy="-24" r="16" fill="#2c2c2c"/>
+            <!-- Hood -->
+            <path d="M-16,-8 C-16,-24 -8,-32 0,-32 C8,-32 16,-24 16,-8" fill="#2c2c2c"/>
+            <!-- Face -->
+            <circle cx="-6" cy="-26" r="2" fill="#fff"/>
+            <circle cx="6" cy="-26" r="2" fill="#fff"/>
+            <!-- Body -->
+            <path d="M-8,8 L8,8 L12,64 L-12,64 Z" fill="#2c2c2c"/>
+            <!-- Arms -->
+            <path d="M-8,8 C-16,8 -24,20 -24,28" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <path d="M8,8 C16,8 24,20 24,28" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <!-- Legs -->
+            <path d="M-8,64 L-16,72" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <path d="M8,64 L16,88" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+        </g>
+    </g>
+    <g transform="translate(256,0)">
+        <!-- Frame 3: Run -->
+        <g transform="translate(32,32)">
+            <!-- Head -->
+            <circle cx="0" cy="-24" r="16" fill="#2c2c2c"/>
+            <!-- Hood -->
+            <path d="M-16,-8 C-16,-24 -8,-32 0,-32 C8,-32 16,-24 16,-8" fill="#2c2c2c"/>
+            <!-- Face -->
+            <circle cx="-6" cy="-26" r="2" fill="#fff"/>
+            <circle cx="6" cy="-26" r="2" fill="#fff"/>
+            <!-- Body -->
+            <path d="M-8,8 L8,8 L12,64 L-12,64 Z" fill="#2c2c2c"/>
+            <!-- Arms -->
+            <path d="M-8,8 C-16,8 -24,16 -24,24" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <path d="M8,8 C16,8 24,16 24,24" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <!-- Legs -->
+            <path d="M-8,64 L-16,88" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <path d="M8,64 L16,72" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+        </g>
+    </g>
+
+    <!-- Jump Animation (2 frames) -->
+    <g transform="translate(320,0)">
+        <!-- Frame 1: Jump -->
+        <g transform="translate(32,32)">
+            <!-- Head -->
+            <circle cx="0" cy="-24" r="16" fill="#2c2c2c"/>
+            <!-- Hood -->
+            <path d="M-16,-8 C-16,-24 -8,-32 0,-32 C8,-32 16,-24 16,-8" fill="#2c2c2c"/>
+            <!-- Face -->
+            <circle cx="-6" cy="-26" r="2" fill="#fff"/>
+            <circle cx="6" cy="-26" r="2" fill="#fff"/>
+            <!-- Body -->
+            <path d="M-8,8 L8,8 L12,64 L-12,64 Z" fill="#2c2c2c"/>
+            <!-- Arms -->
+            <path d="M-8,8 C-16,8 -24,0 -24,-8" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <path d="M8,8 C16,8 24,0 24,-8" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <!-- Legs -->
+            <path d="M-8,64 L-16,80" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <path d="M8,64 L16,80" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+        </g>
+    </g>
+
+    <!-- Attack Animation (2 frames) -->
+    <g transform="translate(384,0)">
+        <!-- Frame 1: Attack -->
+        <g transform="translate(32,32)">
+            <!-- Head -->
+            <circle cx="0" cy="-24" r="16" fill="#2c2c2c"/>
+            <!-- Hood -->
+            <path d="M-16,-8 C-16,-24 -8,-32 0,-32 C8,-32 16,-24 16,-8" fill="#2c2c2c"/>
+            <!-- Face -->
+            <circle cx="-6" cy="-26" r="2" fill="#fff"/>
+            <circle cx="6" cy="-26" r="2" fill="#fff"/>
+            <!-- Body -->
+            <path d="M-8,8 L8,8 L12,64 L-12,64 Z" fill="#2c2c2c"/>
+            <!-- Arms -->
+            <path d="M-8,8 C-16,8 -24,16 -24,24" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <path d="M8,8 C16,8 32,0 40,-8" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <!-- Sword -->
+            <path d="M40,-8 L48,-16" stroke="#silver" stroke-width="4" fill="none"/>
+            <!-- Legs -->
+            <path d="M-8,64 L-16,80" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+            <path d="M8,64 L16,80" stroke="#2c2c2c" stroke-width="8" fill="none"/>
+        </g>
+    </g>
+</svg> 
