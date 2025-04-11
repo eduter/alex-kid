@@ -21,6 +21,7 @@ export class LevelEditor extends Scene {
             spacing: 0
         });
         this.load.image('ui-bg', 'assets/ui-bg.svg');
+        this.load.image('coin', 'assets/coin.svg');
     }
 
     create() {
@@ -115,17 +116,26 @@ export class LevelEditor extends Scene {
             { id: 0, name: 'Ground' },
             { id: 1, name: 'Platform' },
             { id: 4, name: 'Spike' },
-            { id: 7, name: 'Goal' }
+            { id: 7, name: 'Goal' },
+            { id: 8, name: 'Coin', isCoin: true }
         ];
 
         tileTypes.forEach((tile, index) => {
             // Add tile preview next to the text
             if (tile.id >= 0) {
-                this.add.sprite(820, 154 + index * 40 + 10, 'tiles', tile.id)
-                    .setOrigin(0.5)
-                    .setScale(0.8)
-                    .setDepth(10)
-                    .setData('isPalettePreview', true); // Mark as preview
+                if (tile.isCoin) {
+                    this.add.image(820, 154 + index * 40 + 10, 'coin')
+                        .setOrigin(0.5)
+                        .setScale(0.8)
+                        .setDepth(10)
+                        .setData('isPalettePreview', true);
+                } else {
+                    this.add.sprite(820, 154 + index * 40 + 10, 'tiles', tile.id)
+                        .setOrigin(0.5)
+                        .setScale(0.8)
+                        .setDepth(10)
+                        .setData('isPalettePreview', true);
+                }
             }
 
             const button = this.add.text(850, 154 + index * 40, `${tile.name}`, {
@@ -148,7 +158,7 @@ export class LevelEditor extends Scene {
 
     private updateTilePalette() {
         this.tileButtons.forEach((button, index) => {
-            const tileTypes = [-1, 0, 1, 4, 7]; // Match the tile IDs from createTilePalette
+            const tileTypes = [-1, 0, 1, 4, 7, 8]; // Match the tile IDs from createTilePalette
             button.setStyle({
                 backgroundColor: this.selectedTile === tileTypes[index] ? '#666666' : '#4a4a4a'
             });
@@ -201,8 +211,9 @@ export class LevelEditor extends Scene {
         // Clear existing tiles but keep palette previews
         this.children.list
             .filter(child => 
-                child instanceof Phaser.GameObjects.Sprite && 
-                !child.getData('isPalettePreview') // Don't remove previews
+                (child instanceof Phaser.GameObjects.Sprite || child instanceof Phaser.GameObjects.Image) && 
+                !child.getData('isPalettePreview') &&
+                child !== this.uiBackground
             )
             .forEach(child => child.destroy());
 
@@ -211,15 +222,26 @@ export class LevelEditor extends Scene {
             for (let x = 0; x < 24; x++) {
                 const tileId = this.levelData[y][x];
                 if (tileId >= 0) {
-                    this.add.sprite(
-                        x * this.tileSize + this.tileSize / 2,
-                        y * this.tileSize + this.tileSize / 2,
-                        'tiles',
-                        tileId
-                    )
-                    .setOrigin(0.5, 0.5)
-                    .setDepth(3)
-                    .setData('isPalettePreview', false); // Mark as not preview
+                    if (tileId === 8) { // Coin
+                        this.add.image(
+                            x * this.tileSize + this.tileSize / 2,
+                            y * this.tileSize + this.tileSize / 2,
+                            'coin'
+                        )
+                        .setOrigin(0.5, 0.5)
+                        .setDepth(3)
+                        .setData('isPalettePreview', false);
+                    } else {
+                        this.add.sprite(
+                            x * this.tileSize + this.tileSize / 2,
+                            y * this.tileSize + this.tileSize / 2,
+                            'tiles',
+                            tileId
+                        )
+                        .setOrigin(0.5, 0.5)
+                        .setDepth(3)
+                        .setData('isPalettePreview', false);
+                    }
                 }
             }
         }
