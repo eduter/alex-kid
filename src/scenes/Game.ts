@@ -86,7 +86,7 @@ export class Game extends Scene
         }
         
         // Set collision for specific tiles
-        this.groundLayer.setCollisionByExclusion([-1]); // Collide with any tile that isn't empty
+        this.groundLayer.setCollisionByExclusion([-1, 8]); // Collide with any tile that isn't empty or a coin
 
         // Create coins group
         this.coins = this.add.group({
