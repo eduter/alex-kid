@@ -8,6 +8,9 @@ export class Game extends Scene
     private score: number = 0;
     private scoreText!: Phaser.GameObjects.Text;
     private isAttacking: boolean = false;
+    private totalCoins: number = 0;
+    private collectedCoins: number = 0;
+    private isGameOver: boolean = false;
     
     // Tile-based properties
     private tileSize: number = 32;
@@ -26,6 +29,13 @@ export class Game extends Scene
 
     init(data: { isTestingLevel?: boolean })
     {
+        // Reset game state
+        this.isGameOver = false;
+        this.score = 0;
+        this.collectedCoins = 0;
+        this.totalCoins = 0;
+        this.isAttacking = false;
+
         // Initialize empty level data
         for (let y = 0; y < this.gridHeight; y++) {
             this.levelData[y] = [];
@@ -39,6 +49,9 @@ export class Game extends Scene
         if (savedLevel) {
             this.levelData = JSON.parse(savedLevel);
         }
+
+        // Ensure physics is enabled
+        this.physics.resume();
     }
 
     preload()
@@ -112,6 +125,7 @@ export class Game extends Scene
                     
                     // Add to coins group
                     this.coins.add(coin);
+                    this.totalCoins++;
                 }
             }
         }
@@ -119,7 +133,7 @@ export class Game extends Scene
         // Create ninja character at a safe starting position
         this.ninja = this.physics.add.sprite(50, 50, 'ninja');
         this.ninja.setBounce(0.1); // Reduce bounce
-        this.ninja.setCollideWorldBounds(true);
+        this.ninja.setCollideWorldBounds(false); // Allow falling off the level
         this.ninja.setGravityY(600); // Increase gravity
         this.ninja.setSize(32, 48); // Adjust collision box
         this.ninja.setOffset(16, 16); // Center the collision box
@@ -186,7 +200,18 @@ export class Game extends Scene
             if (coin instanceof Coin) {
                 coin.collect();
                 this.score += 10;
+                this.collectedCoins++;
                 this.scoreText.setText('Score: ' + this.score);
+                
+                // Check if all coins are collected
+                console.log('Coins collected:', this.collectedCoins, 'Total coins:', this.totalCoins);
+                if (this.collectedCoins >= this.totalCoins) {
+                    console.log('Win condition triggered!');
+                    // Wait for the coin collection animation to complete before showing win screen
+                    this.time.delayedCall(300, () => {
+                        this.handleWin();
+                    });
+                }
             }
         }, undefined, this);
 
@@ -200,8 +225,8 @@ export class Game extends Scene
         .setScrollFactor(0) // Keep score fixed on screen
         .setDepth(100);
         
-        // Add camera follow
-        this.cameras.main.setBounds(0, 0, this.tilemap.widthInPixels, this.tilemap.heightInPixels);
+        // Add camera follow with adjusted bounds
+        this.cameras.main.setBounds(0, 0, this.tilemap.widthInPixels, this.tilemap.heightInPixels); // Add extra space below
         this.cameras.main.startFollow(this.ninja, true);
 
         // Add return to editor key
@@ -210,41 +235,124 @@ export class Game extends Scene
         });
     }
 
+    private handleGameOver() {
+        this.isGameOver = true;
+        
+        // Freeze all physics
+        this.physics.pause();
+        
+        // Show game over text
+        this.add.text(400, 300, 'Game Over!', {
+            fontSize: '64px',
+            color: '#ff0000',
+            stroke: '#000',
+            strokeThickness: 6
+        }).setOrigin(0.5);
+        
+        // Add restart button
+        const restartButton = this.add.text(400, 400, 'Restart', {
+            fontSize: '32px',
+            color: '#fff',
+            backgroundColor: '#4a4a4a',
+            padding: { x: 20, y: 10 }
+        })
+        .setOrigin(0.5)
+        .setInteractive()
+        .on('pointerdown', () => {
+            this.scene.restart();
+        });
+        
+        // Add hover effect
+        restartButton.on('pointerover', () => {
+            restartButton.setStyle({ backgroundColor: '#666666' });
+        });
+        restartButton.on('pointerout', () => {
+            restartButton.setStyle({ backgroundColor: '#4a4a4a' });
+        });
+    }
+
+    private handleWin() {
+        this.isGameOver = true;
+        
+        // Freeze all physics
+        this.physics.pause();
+        
+        // Show win text
+        this.add.text(400, 300, 'Level Complete!', {
+            fontSize: '64px',
+            color: '#00ff00',
+            stroke: '#000',
+            strokeThickness: 6
+        }).setOrigin(0.5);
+        
+        // Add next level button
+        const nextButton = this.add.text(400, 400, 'Next Level', {
+            fontSize: '32px',
+            color: '#fff',
+            backgroundColor: '#4a4a4a',
+            padding: { x: 20, y: 10 }
+        })
+        .setOrigin(0.5)
+        .setInteractive()
+        .on('pointerdown', () => {
+            this.scene.start('LevelEditor');
+        });
+        
+        // Add hover effect
+        nextButton.on('pointerover', () => {
+            nextButton.setStyle({ backgroundColor: '#666666' });
+        });
+        nextButton.on('pointerout', () => {
+            nextButton.setStyle({ backgroundColor: '#4a4a4a' });
+        });
+    }
+
     update()
     {
         if (!this.ninja.body || !this.cursors) return;
 
-        const onGround = this.ninja.body.blocked.down;
-
-        // Handle movement
-        if (this.cursors.left.isDown) {
-            this.ninja.setVelocityX(-160);
-            if (!this.isAttacking && onGround) {
-                this.ninja.anims.play('run', true);
-            }
-            this.ninja.flipX = true;
-        } else if (this.cursors.right.isDown) {
-            this.ninja.setVelocityX(160);
-            if (!this.isAttacking && onGround) {
-                this.ninja.anims.play('run', true);
-            }
-            this.ninja.flipX = false;
-        } else {
-            this.ninja.setVelocityX(0);
-            if (!this.isAttacking && onGround) {
-                this.ninja.anims.play('idle', true);
-            }
+        // Check if player has fallen off the level (only if not already game over)
+        if (!this.isGameOver && this.ninja.y > this.gridHeight * this.tileSize) {
+            // Immediately destroy the player and trigger game over
+            this.ninja.destroy();
+            this.handleGameOver();
+            return;
         }
 
-        // Handle jumping
-        if (this.cursors.up.isDown && onGround) {
-            this.ninja.setVelocityY(-450);
-            this.ninja.anims.play('jump', true);
-        }
+        // Only process movement if game is not over
+        if (!this.isGameOver) {
+            const onGround = this.ninja.body.blocked.down;
 
-        // Play jump animation while in air
-        if (!onGround && !this.isAttacking) {
-            this.ninja.anims.play('jump', true);
+            // Handle movement
+            if (this.cursors.left.isDown) {
+                this.ninja.setVelocityX(-160);
+                if (!this.isAttacking && onGround) {
+                    this.ninja.anims.play('run', true);
+                }
+                this.ninja.flipX = true;
+            } else if (this.cursors.right.isDown) {
+                this.ninja.setVelocityX(160);
+                if (!this.isAttacking && onGround) {
+                    this.ninja.anims.play('run', true);
+                }
+                this.ninja.flipX = false;
+            } else {
+                this.ninja.setVelocityX(0);
+                if (!this.isAttacking && onGround) {
+                    this.ninja.anims.play('idle', true);
+                }
+            }
+
+            // Handle jumping
+            if (this.cursors.up.isDown && onGround) {
+                this.ninja.setVelocityY(-450);
+                this.ninja.anims.play('jump', true);
+            }
+
+            // Play jump animation while in air
+            if (!onGround && !this.isAttacking) {
+                this.ninja.anims.play('jump', true);
+            }
         }
     }
 }
