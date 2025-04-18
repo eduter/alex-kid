@@ -1,52 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="256" height="256" version="1.1" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-    <!-- Tile 1: Ground -->
+<svg width="128" height="256" version="1.1" viewBox="0 0 128 256" xmlns="http://www.w3.org/2000/svg">
+    <!-- Tile 0: Ground -->
     <rect x="0" y="0" width="32" height="32" fill="#8b4513"/>
     <rect x="0" y="0" width="32" height="4" fill="#654321"/>
     <rect x="0" y="28" width="32" height="4" fill="#654321"/>
     
-    <!-- Tile 2: Platform -->
+    <!-- Tile 1: Platform -->
     <rect x="32" y="0" width="32" height="32" fill="#8b4513"/>
     <rect x="32" y="0" width="32" height="4" fill="#654321"/>
     <rect x="32" y="28" width="32" height="4" fill="#654321"/>
     <rect x="32" y="12" width="32" height="4" fill="#654321"/>
     
-    <!-- Tile 3: Brick -->
+    <!-- Tile 2: Grass (mapped to ID 4 in the game) -->
     <rect x="64" y="0" width="32" height="32" fill="#8b4513"/>
     <rect x="64" y="0" width="32" height="4" fill="#654321"/>
     <rect x="64" y="28" width="32" height="4" fill="#654321"/>
-    <rect x="64" y="0" width="4" height="32" fill="#654321"/>
-    <rect x="84" y="0" width="4" height="32" fill="#654321"/>
+    <rect x="64" y="0" width="32" height="8" fill="#228B22"/>
+    <rect x="64" y="8" width="32" height="4" fill="#32CD32"/>
     
-    <!-- Tile 4: Grass -->
-    <rect x="96" y="0" width="32" height="32" fill="#8b4513"/>
-    <rect x="96" y="0" width="32" height="4" fill="#654321"/>
-    <rect x="96" y="28" width="32" height="4" fill="#654321"/>
-    <rect x="96" y="0" width="32" height="8" fill="#228B22"/>
-    <rect x="96" y="8" width="32" height="4" fill="#32CD32"/>
-    
-    <!-- Tile 5: Water -->
-    <rect x="128" y="0" width="32" height="32" fill="#1E90FF"/>
-    <rect x="128" y="0" width="32" height="4" fill="#0000CD"/>
-    <rect x="128" y="28" width="32" height="4" fill="#0000CD"/>
-    <rect x="128" y="12" width="32" height="4" fill="#87CEEB"/>
-    
-    <!-- Tile 6: Lava -->
-    <rect x="160" y="0" width="32" height="32" fill="#FF4500"/>
-    <rect x="160" y="0" width="32" height="4" fill="#8B0000"/>
-    <rect x="160" y="28" width="32" height="4" fill="#8B0000"/>
-    <rect x="160" y="12" width="32" height="4" fill="#FFD700"/>
-    
-    <!-- Tile 7: Coin -->
-    <circle cx="192" cy="16" r="12" fill="#FFD700"/>
-    <circle cx="192" cy="16" r="8" fill="#FFA500"/>
-    <circle cx="192" cy="16" r="4" fill="#FFFF00"/>
-    
-    <!-- Tile 8: Exit -->
-    <rect x="224" y="0" width="32" height="32" fill="#4B0082"/>
-    <rect x="224" y="0" width="32" height="4" fill="#2E0854"/>
-    <rect x="224" y="28" width="32" height="4" fill="#2E0854"/>
-    <rect x="224" y="0" width="4" height="32" fill="#2E0854"/>
-    <rect x="252" y="0" width="4" height="32" fill="#2E0854"/>
-    <path d="M240,8 L248,16 L240,24 L232,16 Z" fill="#9370DB"/>
+    <!-- Tile 3: Exit (mapped to ID 7 in the game) -->
+    <rect x="96" y="0" width="32" height="32" fill="#4B0082"/>
+    <rect x="96" y="0" width="32" height="4" fill="#2E0854"/>
+    <rect x="96" y="28" width="32" height="4" fill="#2E0854"/>
+    <rect x="96" y="0" width="4" height="32" fill="#2E0854"/>
+    <rect x="124" y="0" width="4" height="32" fill="#2E0854"/>
+    <path d="M112,8 L120,16 L112,24 L104,16 Z" fill="#9370DB"/>
 </svg> 

@@ -115,7 +115,7 @@ export class LevelEditor extends Scene {
             { id: -1, name: 'Empty' },
             { id: 0, name: 'Ground' },
             { id: 1, name: 'Platform' },
-            { id: 4, name: 'Spike' },
+            { id: 4, name: 'Grass' },
             { id: 7, name: 'Goal' },
             { id: 8, name: 'Coin', isCoin: true }
         ];
@@ -125,6 +125,20 @@ export class LevelEditor extends Scene {
             if (tile.id >= 0) {
                 if (tile.isCoin) {
                     this.add.image(820, 154 + index * 40 + 10, 'coin')
+                        .setOrigin(0.5)
+                        .setScale(0.8)
+                        .setDepth(10)
+                        .setData('isPalettePreview', true);
+                } else if (tile.id === 4) {
+                    // For grass tile, use the correct index in the tileset
+                    this.add.sprite(820, 154 + index * 40 + 10, 'tiles', 2)
+                        .setOrigin(0.5)
+                        .setScale(0.8)
+                        .setDepth(10)
+                        .setData('isPalettePreview', true);
+                } else if (tile.id === 7) {
+                    // For goal tile, use the correct index in the tileset
+                    this.add.sprite(820, 154 + index * 40 + 10, 'tiles', 3)
                         .setOrigin(0.5)
                         .setScale(0.8)
                         .setDepth(10)
@@ -217,6 +231,26 @@ export class LevelEditor extends Scene {
                             x * this.tileSize + this.tileSize / 2,
                             y * this.tileSize + this.tileSize / 2,
                             'coin'
+                        )
+                        .setOrigin(0.5, 0.5)
+                        .setDepth(3)
+                        .setData('isPalettePreview', false);
+                    } else if (tileId === 4) { // Grass
+                        this.add.sprite(
+                            x * this.tileSize + this.tileSize / 2,
+                            y * this.tileSize + this.tileSize / 2,
+                            'tiles',
+                            2 // Use the correct index in the tileset
+                        )
+                        .setOrigin(0.5, 0.5)
+                        .setDepth(3)
+                        .setData('isPalettePreview', false);
+                    } else if (tileId === 7) { // Goal
+                        this.add.sprite(
+                            x * this.tileSize + this.tileSize / 2,
+                            y * this.tileSize + this.tileSize / 2,
+                            'tiles',
+                            3 // Use the correct index in the tileset
                         )
                         .setOrigin(0.5, 0.5)
                         .setDepth(3)

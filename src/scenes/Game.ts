@@ -107,7 +107,7 @@ export class Game extends Scene
         
         // Set collision for specific tiles
         this.groundLayer.setCollisionByExclusion([-1, 8, 7]); // Collide with any tile that isn't empty, coin, or goal
-
+        
         // Create coins group
         this.coins = this.add.group({
             classType: Coin,
@@ -137,7 +137,7 @@ export class Game extends Scene
                         x * this.tileSize + this.tileSize / 2,
                         y * this.tileSize + this.tileSize / 2,
                         'tiles',
-                        7
+                        3 // Use the correct index in the tileset
                     );
                     this.goalTile.setOrigin(0.5);
                     
@@ -152,6 +152,12 @@ export class Game extends Scene
                         yoyo: true,
                         repeat: -1
                     });
+                } else if (this.levelData[y][x] === 4) { // Grass tile
+                    // Replace the grass tile with the correct index in the tileset
+                    const tile = this.groundLayer.getTileAt(x, y);
+                    if (tile) {
+                        tile.index = 2; // Map to the correct index in the tileset
+                    }
                 }
             }
         }
