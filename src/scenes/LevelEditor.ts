@@ -166,19 +166,9 @@ export class LevelEditor extends Scene {
     }
 
     private createButtons() {
-        // Save button
-        this.add.text(820, 500, 'Save Level (Ctrl+S)', {
-            fontSize: '16px',
-            color: '#fff',
-            backgroundColor: '#4a4a4a',
-            padding: { x: 10, y: 5 }
-        })
-        .setInteractive()
-        .setDepth(10)
-        .on('pointerdown', () => this.saveLevel());
 
         // Load button
-        this.add.text(820, 550, 'Load Level', {
+        this.add.text(820, 500, 'Load Level', {
             fontSize: '16px',
             color: '#fff',
             backgroundColor: '#4a4a4a',
@@ -189,7 +179,7 @@ export class LevelEditor extends Scene {
         .on('pointerdown', () => this.loadLevel());
 
         // Test button
-        this.add.text(820, 600, 'Test Level', {
+        this.add.text(820, 550, 'Test Level', {
             fontSize: '16px',
             color: '#fff',
             backgroundColor: '#4a4a4a',
