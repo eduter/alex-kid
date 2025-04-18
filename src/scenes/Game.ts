@@ -11,6 +11,7 @@ export class Game extends Scene
     private totalCoins: number = 0;
     private collectedCoins: number = 0;
     private isGameOver: boolean = false;
+    private goalTile!: Phaser.GameObjects.Sprite;
     
     // Tile-based properties
     private tileSize: number = 32;
@@ -63,7 +64,11 @@ export class Game extends Scene
         );
         
         // Load tile assets
-        this.load.image('tiles', 'assets/tileset.svg');
+        this.load.spritesheet('tiles', 'assets/tileset.svg', {
+            frameWidth: 32,
+            frameHeight: 32,
+            spacing: 0
+        });
         this.load.image('coin', 'assets/coin.svg');
         
         this.load.image('background', 'assets/background.svg');
@@ -101,7 +106,7 @@ export class Game extends Scene
         }
         
         // Set collision for specific tiles
-        this.groundLayer.setCollisionByExclusion([-1, 8]); // Collide with any tile that isn't empty or a coin
+        this.groundLayer.setCollisionByExclusion([-1, 8, 7]); // Collide with any tile that isn't empty, coin, or goal
 
         // Create coins group
         this.coins = this.add.group({
@@ -109,7 +114,7 @@ export class Game extends Scene
             runChildUpdate: true
         });
         
-        // Place coins based on level data
+        // Place coins and goal based on level data
         for (let y = 0; y < this.gridHeight; y++) {
             for (let x = 0; x < this.gridWidth; x++) {
                 if (this.levelData[y][x] === 8) { // Coin tile
@@ -126,6 +131,27 @@ export class Game extends Scene
                     // Add to coins group
                     this.coins.add(coin);
                     this.totalCoins++;
+                } else if (this.levelData[y][x] === 7) { // Goal tile
+                    // Create goal sprite
+                    this.goalTile = this.add.sprite(
+                        x * this.tileSize + this.tileSize / 2,
+                        y * this.tileSize + this.tileSize / 2,
+                        'tiles',
+                        7
+                    );
+                    this.goalTile.setOrigin(0.5);
+                    
+                    // Enable physics on the goal tile
+                    this.physics.add.existing(this.goalTile, true); // true makes it static
+                    
+                    // Add a pulsing effect to the goal
+                    this.tweens.add({
+                        targets: this.goalTile,
+                        alpha: 0.7,
+                        duration: 1000,
+                        yoyo: true,
+                        repeat: -1
+                    });
                 }
             }
         }
@@ -195,25 +221,22 @@ export class Game extends Scene
 
         // Add collision between ninja and coins
         this.physics.add.overlap(this.ninja, this.coins, (_ninja, coin) => {
-            console.log('collectCoin', _ninja, coin);
-            
             if (coin instanceof Coin) {
                 coin.collect();
                 this.score += 10;
                 this.collectedCoins++;
                 this.scoreText.setText('Score: ' + this.score);
-                
-                // Check if all coins are collected
-                console.log('Coins collected:', this.collectedCoins, 'Total coins:', this.totalCoins);
-                if (this.collectedCoins >= this.totalCoins) {
-                    console.log('Win condition triggered!');
-                    // Wait for the coin collection animation to complete before showing win screen
-                    this.time.delayedCall(300, () => {
-                        this.handleWin();
-                    });
-                }
             }
         }, undefined, this);
+
+        // Add overlap detection between ninja and goal
+        if (this.goalTile) {
+            this.physics.add.overlap(this.ninja, this.goalTile, () => {
+                if (!this.isGameOver) {
+                    this.handleWin();
+                }
+            });
+        }
 
         // Add score text
         this.scoreText = this.add.text(16, 16, 'Score: 0', { 
