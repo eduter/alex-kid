@@ -1,13 +1,54 @@
 import { Scene } from 'phaser';
 
+interface TMXLayer {
+    data: number[];
+    height: number;
+    width: number;
+    name: string;
+    opacity: number;
+    type: string;
+    visible: boolean;
+    x: number;
+    y: number;
+}
+
+interface TMXTileset {
+    firstgid: number;
+    image: string;
+    imageheight: number;
+    imagewidth: number;
+    margin: number;
+    name: string;
+    spacing: number;
+    tileheight: number;
+    tilewidth: number;
+}
+
+interface TMXMap {
+    height: number;
+    width: number;
+    layers: TMXLayer[];
+    nextlayerid: number;
+    nextobjectid: number;
+    orientation: string;
+    renderorder: string;
+    tiledversion: string;
+    tileheight: number;
+    tilesets: TMXTileset[];
+    tilewidth: number;
+    type: string;
+    version: string;
+}
+
 export class LevelEditor extends Scene {
     private grid: Phaser.GameObjects.Graphics;
     private selectedTile: number = 0;
     private isEraser: boolean = false;
     private tileSize: number = 32;
-    private levelData: number[][] = [];
+    private tmxData: TMXMap;
     private tileButtons: Phaser.GameObjects.Text[] = [];
     private uiBackground: Phaser.GameObjects.Image;
+    private currentLayer: number = 0;
 
     constructor() {
         super('LevelEditor');
@@ -35,8 +76,8 @@ export class LevelEditor extends Scene {
         this.drawGrid();
         this.grid.setDepth(2);
 
-        // Initialize empty level data
-        this.initializeLevelData();
+        // Initialize empty TMX data
+        this.initializeTMXData();
 
         // Create tile palette
         this.createTilePalette();
@@ -81,14 +122,42 @@ export class LevelEditor extends Scene {
         }
     }
 
-    private initializeLevelData() {
-        // Create a 24x24 grid of empty tiles (-1)
-        for (let y = 0; y < 24; y++) {
-            this.levelData[y] = [];
-            for (let x = 0; x < 24; x++) {
-                this.levelData[y][x] = -1;
-            }
-        }
+    private initializeTMXData() {
+        this.tmxData = {
+            height: 24,
+            width: 24,
+            layers: [{
+                data: Array(24 * 24).fill(0), // 0 is empty in TMX
+                height: 24,
+                width: 24,
+                name: "main",
+                opacity: 1,
+                type: "tilelayer",
+                visible: true,
+                x: 0,
+                y: 0
+            }],
+            nextlayerid: 2,
+            nextobjectid: 1,
+            orientation: "orthogonal",
+            renderorder: "right-down",
+            tiledversion: "1.10.2",
+            tileheight: 32,
+            tilesets: [{
+                firstgid: 1,
+                image: "tileset.svg",
+                imageheight: 32,
+                imagewidth: 32,
+                margin: 0,
+                name: "tiles",
+                spacing: 0,
+                tileheight: 32,
+                tilewidth: 32
+            }],
+            tilewidth: 32,
+            type: "map",
+            version: "1.10"
+        };
     }
 
     private drawGrid() {
@@ -112,39 +181,25 @@ export class LevelEditor extends Scene {
 
     private createTilePalette() {
         const tileTypes = [
-            { id: -1, name: 'Empty' },
-            { id: 0, name: 'Ground' },
-            { id: 1, name: 'Platform' },
-            { id: 4, name: 'Grass' },
-            { id: 7, name: 'Goal' },
-            { id: 8, name: 'Coin', isCoin: true }
+            { id: 0, name: 'Empty' },
+            { id: 1, name: 'Ground' },      // First tile in tileset (x=0)
+            { id: 2, name: 'Platform' },    // Second tile in tileset (x=32)
+            { id: 3, name: 'Grass' },       // Third tile in tileset (x=64)
+            { id: 4, name: 'Goal' },        // Fourth tile in tileset (x=96)
+            { id: 5, name: 'Coin', isCoin: true }
         ];
 
         tileTypes.forEach((tile, index) => {
             // Add tile preview next to the text
-            if (tile.id >= 0) {
+            if (tile.id > 0) {
                 if (tile.isCoin) {
                     this.add.image(820, 154 + index * 40 + 10, 'coin')
                         .setOrigin(0.5)
                         .setScale(0.8)
                         .setDepth(10)
                         .setData('isPalettePreview', true);
-                } else if (tile.id === 4) {
-                    // For grass tile, use the correct index in the tileset
-                    this.add.sprite(820, 154 + index * 40 + 10, 'tiles', 2)
-                        .setOrigin(0.5)
-                        .setScale(0.8)
-                        .setDepth(10)
-                        .setData('isPalettePreview', true);
-                } else if (tile.id === 7) {
-                    // For goal tile, use the correct index in the tileset
-                    this.add.sprite(820, 154 + index * 40 + 10, 'tiles', 3)
-                        .setOrigin(0.5)
-                        .setScale(0.8)
-                        .setDepth(10)
-                        .setData('isPalettePreview', true);
                 } else {
-                    this.add.sprite(820, 154 + index * 40 + 10, 'tiles', tile.id)
+                    this.add.sprite(820, 154 + index * 40 + 10, 'tiles', tile.id - 1)
                         .setOrigin(0.5)
                         .setScale(0.8)
                         .setDepth(10)
@@ -172,7 +227,7 @@ export class LevelEditor extends Scene {
 
     private updateTilePalette() {
         this.tileButtons.forEach((button, index) => {
-            const tileTypes = [-1, 0, 1, 4, 7, 8]; // Match the tile IDs from createTilePalette
+            const tileTypes = [0, 1, 2, 3, 4, 5]; // Match the tile IDs from createTilePalette
             button.setStyle({
                 backgroundColor: this.selectedTile === tileTypes[index] ? '#666666' : '#4a4a4a'
             });
@@ -180,7 +235,6 @@ export class LevelEditor extends Scene {
     }
 
     private createButtons() {
-
         // Load button
         this.add.text(820, 500, 'Load Level', {
             fontSize: '16px',
@@ -206,7 +260,8 @@ export class LevelEditor extends Scene {
 
     private placeTile(x: number, y: number) {
         if (x >= 0 && x < 24 && y >= 0 && y < 24) {
-            this.levelData[y][x] = this.isEraser ? -1 : this.selectedTile;
+            const index = y * 24 + x;
+            this.tmxData.layers[this.currentLayer].data[index] = this.isEraser ? 0 : this.selectedTile;
             this.drawLevel();
         }
     }
@@ -222,35 +277,16 @@ export class LevelEditor extends Scene {
             .forEach(child => child.destroy());
 
         // Draw tiles
+        const layer = this.tmxData.layers[this.currentLayer];
         for (let y = 0; y < 24; y++) {
             for (let x = 0; x < 24; x++) {
-                const tileId = this.levelData[y][x];
-                if (tileId >= 0) {
-                    if (tileId === 8) { // Coin
+                const tileId = layer.data[y * 24 + x];
+                if (tileId > 0) {
+                    if (tileId === 5) { // Coin
                         this.add.image(
                             x * this.tileSize + this.tileSize / 2,
                             y * this.tileSize + this.tileSize / 2,
                             'coin'
-                        )
-                        .setOrigin(0.5, 0.5)
-                        .setDepth(3)
-                        .setData('isPalettePreview', false);
-                    } else if (tileId === 4) { // Grass
-                        this.add.sprite(
-                            x * this.tileSize + this.tileSize / 2,
-                            y * this.tileSize + this.tileSize / 2,
-                            'tiles',
-                            2 // Use the correct index in the tileset
-                        )
-                        .setOrigin(0.5, 0.5)
-                        .setDepth(3)
-                        .setData('isPalettePreview', false);
-                    } else if (tileId === 7) { // Goal
-                        this.add.sprite(
-                            x * this.tileSize + this.tileSize / 2,
-                            y * this.tileSize + this.tileSize / 2,
-                            'tiles',
-                            3 // Use the correct index in the tileset
                         )
                         .setOrigin(0.5, 0.5)
                         .setDepth(3)
@@ -260,7 +296,7 @@ export class LevelEditor extends Scene {
                             x * this.tileSize + this.tileSize / 2,
                             y * this.tileSize + this.tileSize / 2,
                             'tiles',
-                            tileId
+                            tileId - 1
                         )
                         .setOrigin(0.5, 0.5)
                         .setDepth(3)
@@ -272,7 +308,7 @@ export class LevelEditor extends Scene {
     }
 
     private saveLevel() {
-        const levelJson = JSON.stringify(this.levelData);
+        const levelJson = JSON.stringify(this.tmxData);
         localStorage.setItem('savedLevel', levelJson);
         alert('Level saved!');
     }
@@ -280,8 +316,12 @@ export class LevelEditor extends Scene {
     private loadLevel() {
         const savedLevel = localStorage.getItem('savedLevel');
         if (savedLevel) {
-            this.levelData = JSON.parse(savedLevel);
-            this.drawLevel();
+            try {
+                this.tmxData = JSON.parse(savedLevel);
+                this.drawLevel();
+            } catch (e) {
+                alert('Error loading level: Invalid TMX JSON format');
+            }
         } else {
             alert('No saved level found!');
         }
@@ -289,7 +329,7 @@ export class LevelEditor extends Scene {
 
     private testLevel() {
         // Save current level to localStorage for the Game scene to load
-        localStorage.setItem('savedLevel', JSON.stringify(this.levelData));
+        localStorage.setItem('savedLevel', JSON.stringify(this.tmxData));
         this.scene.start('Game');
     }
 } 

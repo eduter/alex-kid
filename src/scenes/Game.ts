@@ -1,6 +1,46 @@
 import { Scene } from 'phaser';
 import { Coin } from '../objects/Coin';
 
+interface TMXLayer {
+    data: number[];
+    height: number;
+    width: number;
+    name: string;
+    opacity: number;
+    type: string;
+    visible: boolean;
+    x: number;
+    y: number;
+}
+
+interface TMXTileset {
+    firstgid: number;
+    image: string;
+    imageheight: number;
+    imagewidth: number;
+    margin: number;
+    name: string;
+    spacing: number;
+    tileheight: number;
+    tilewidth: number;
+}
+
+interface TMXMap {
+    height: number;
+    width: number;
+    layers: TMXLayer[];
+    nextlayerid: number;
+    nextobjectid: number;
+    orientation: string;
+    renderorder: string;
+    tiledversion: string;
+    tileheight: number;
+    tilesets: TMXTileset[];
+    tilewidth: number;
+    type: string;
+    version: string;
+}
+
 export class Game extends Scene
 {
     private ninja!: Phaser.Physics.Arcade.Sprite;
@@ -15,9 +55,9 @@ export class Game extends Scene
     
     // Tile-based properties
     private tileSize: number = 32;
-    private gridWidth: number = 32; // 32 tiles wide
-    private gridHeight: number = 24; // 24 tiles high
-    private levelData: number[][] = [];
+    private gridWidth: number = 24; // Changed from 32 to 24 to match editor
+    private gridHeight: number = 24;
+    private tmxData: TMXMap;
     private tilemap!: Phaser.Tilemaps.Tilemap;
     private tileset!: Phaser.Tilemaps.Tileset | null;
     private groundLayer!: Phaser.Tilemaps.TilemapLayer | null;
@@ -37,18 +77,51 @@ export class Game extends Scene
         this.totalCoins = 0;
         this.isAttacking = false;
 
-        // Initialize empty level data
-        for (let y = 0; y < this.gridHeight; y++) {
-            this.levelData[y] = [];
-            for (let x = 0; x < this.gridWidth; x++) {
-                this.levelData[y][x] = -1;
-            }
-        }
+        // Initialize empty TMX data
+        this.tmxData = {
+            height: 24,
+            width: 24,
+            layers: [{
+                data: Array(24 * 24).fill(0),
+                height: 24,
+                width: 24,
+                name: "main",
+                opacity: 1,
+                type: "tilelayer",
+                visible: true,
+                x: 0,
+                y: 0
+            }],
+            nextlayerid: 2,
+            nextobjectid: 1,
+            orientation: "orthogonal",
+            renderorder: "right-down",
+            tiledversion: "1.10.2",
+            tileheight: 32,
+            tilesets: [{
+                firstgid: 1,
+                image: "tileset.svg",
+                imageheight: 32,
+                imagewidth: 32,
+                margin: 0,
+                name: "tiles",
+                spacing: 0,
+                tileheight: 32,
+                tilewidth: 32
+            }],
+            tilewidth: 32,
+            type: "map",
+            version: "1.10"
+        };
 
         // Load saved level if available
         const savedLevel = localStorage.getItem('savedLevel');
         if (savedLevel) {
-            this.levelData = JSON.parse(savedLevel);
+            try {
+                this.tmxData = JSON.parse(savedLevel);
+            } catch (e) {
+                console.error('Error loading level: Invalid TMX JSON format');
+            }
         }
 
         // Ensure physics is enabled
@@ -81,9 +154,21 @@ export class Game extends Scene
         background.setOrigin(0, 0);
         background.setDisplaySize(this.game.config.width as number, this.game.config.height as number);
 
-        // Create tilemap
+        // Create tilemap from TMX data
+        const layerData = this.tmxData.layers[0].data;
+        const tilemapData: number[][] = [];
+
+        for (let y = 0; y < this.gridHeight; y++) {
+            tilemapData[y] = [];
+            for (let x = 0; x < this.gridWidth; x++) {
+                const tileId = layerData[y * this.gridWidth + x];
+                // Only include non-empty tiles in the tilemap data
+                tilemapData[y][x] = tileId > 0 ? tileId - 1 : -1; // Subtract 1 to match tileset indices
+            }
+        }
+
         this.tilemap = this.make.tilemap({
-            data: this.levelData,
+            data: tilemapData,
             tileWidth: this.tileSize,
             tileHeight: this.tileSize,
             width: this.gridWidth,
@@ -105,8 +190,8 @@ export class Game extends Scene
             return;
         }
         
-        // Set collision for specific tiles
-        this.groundLayer.setCollisionByExclusion([-1, 8, 7]); // Collide with any tile that isn't empty, coin, or goal
+        // Set collision for ground, platform, and grass tiles
+        this.groundLayer.setCollision([0, 1, 2]); // 0=ground, 1=platform, 2=grass
         
         // Create coins group
         this.coins = this.add.group({
@@ -114,13 +199,12 @@ export class Game extends Scene
             runChildUpdate: true
         });
         
-        // Place coins and goal based on level data
+        // Place coins and goal based on TMX data
+        const layer = this.tmxData.layers[0];
         for (let y = 0; y < this.gridHeight; y++) {
             for (let x = 0; x < this.gridWidth; x++) {
-                if (this.levelData[y][x] === 8) { // Coin tile
-                    // Remove coin from level data so it doesn't create a collision
-                    this.levelData[y][x] = -1;
-                    
+                const tileId = layer.data[y * this.gridWidth + x];
+                if (tileId === 5) { // Coin tile
                     // Create coin using the Coin class
                     const coin = new Coin(
                         this,
@@ -131,7 +215,7 @@ export class Game extends Scene
                     // Add to coins group
                     this.coins.add(coin);
                     this.totalCoins++;
-                } else if (this.levelData[y][x] === 7) { // Goal tile
+                } else if (tileId === 4) { // Goal tile
                     // Create goal sprite
                     this.goalTile = this.add.sprite(
                         x * this.tileSize + this.tileSize / 2,
@@ -152,12 +236,6 @@ export class Game extends Scene
                         yoyo: true,
                         repeat: -1
                     });
-                } else if (this.levelData[y][x] === 4) { // Grass tile
-                    // Replace the grass tile with the correct index in the tileset
-                    const tile = this.groundLayer.getTileAt(x, y);
-                    if (tile) {
-                        tile.index = 2; // Map to the correct index in the tileset
-                    }
                 }
             }
         }
@@ -255,7 +333,7 @@ export class Game extends Scene
         .setDepth(100);
         
         // Add camera follow with adjusted bounds
-        this.cameras.main.setBounds(0, 0, this.tilemap.widthInPixels, this.tilemap.heightInPixels); // Add extra space below
+        this.cameras.main.setBounds(0, 0, this.tilemap.widthInPixels, this.tilemap.heightInPixels);
         this.cameras.main.startFollow(this.ninja, true);
 
         // Add return to editor key
